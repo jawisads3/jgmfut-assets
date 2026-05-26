@@ -65,7 +65,7 @@
     display: block;
   }
 
-  input[type="text"], input[type="number"] {
+  .text-input {
     width: 100%;
     background: var(--surface2);
     border: 1px solid var(--border);
@@ -77,27 +77,41 @@
     outline: none;
     transition: border-color 0.2s;
     -webkit-appearance: none;
+    appearance: none;
+    display: block;
   }
 
-  input:focus { border-color: var(--accent); }
+  .text-input:focus { border-color: var(--accent); }
 
-  input[type="range"] {
+  .range-input {
     width: 100%;
     -webkit-appearance: none;
+    appearance: none;
     height: 4px;
     background: var(--border);
     border-radius: 2px;
     outline: none;
     margin: 8px 0;
+    display: block;
+    cursor: pointer;
   }
 
-  input[type="range"]::-webkit-slider-thumb {
+  .range-input::-webkit-slider-thumb {
     -webkit-appearance: none;
-    width: 18px;
-    height: 18px;
+    width: 20px;
+    height: 20px;
     background: var(--accent);
     border-radius: 50%;
     cursor: pointer;
+  }
+
+  .range-input::-moz-range-thumb {
+    width: 20px;
+    height: 20px;
+    background: var(--accent);
+    border-radius: 50%;
+    cursor: pointer;
+    border: none;
   }
 
   .checkbox-grid {
@@ -121,9 +135,8 @@
   }
 
   .cb-item:hover { border-color: var(--accent); }
-  .cb-item.active { border-color: var(--accent); background: rgba(123,92,240,0.1); }
 
-  .cb-item input[type="checkbox"] {
+  .cb-item input {
     width: 16px;
     height: 16px;
     accent-color: var(--accent);
@@ -159,27 +172,19 @@
     padding: 6px 10px;
     color: var(--accent2);
     font-family: 'Space Mono', monospace;
-    font-size: 14px;
+    font-size: 15px;
     cursor: pointer;
     transition: border-color 0.15s, background 0.15s;
     width: auto;
     min-width: 36px;
     text-align: center;
+    -webkit-tap-highlight-color: transparent;
   }
 
   .sp-btn:hover { border-color: var(--accent); background: rgba(123,92,240,0.15); }
-  .sp-btn.selected { border-color: var(--accent); background: rgba(123,92,240,0.25); color: white; }
+  .sp-btn.selected { border-color: var(--accent); background: rgba(123,92,240,0.3); color: white; }
 
-  .len-display {
-    font-family: 'Space Mono', monospace;
-    font-size: 28px;
-    font-weight: 700;
-    color: var(--accent2);
-    text-align: center;
-    margin-bottom: 4px;
-  }
-
-  button.gen-btn {
+  .gen-btn {
     width: 100%;
     background: var(--accent);
     color: white;
@@ -193,9 +198,29 @@
     letter-spacing: 0.5px;
     transition: opacity 0.15s, transform 0.1s;
     -webkit-tap-highlight-color: transparent;
+    display: block;
   }
 
-  button.gen-btn:active { opacity: 0.85; transform: scale(0.98); }
+  .gen-btn:active { opacity: 0.85; transform: scale(0.98); }
+
+  .copy-btn {
+    width: 100%;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 12px;
+    color: var(--accent2);
+    font-family: 'Syne', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    margin-top: 10px;
+    cursor: pointer;
+    transition: border-color 0.2s;
+    -webkit-tap-highlight-color: transparent;
+    display: block;
+  }
+
+  .copy-btn:hover { border-color: var(--accent); }
 
   .result-box {
     background: var(--surface2);
@@ -218,23 +243,14 @@
     margin-top: 8px;
   }
 
-  .copy-btn {
-    width: 100%;
-    background: var(--surface2);
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    padding: 12px;
-    color: var(--accent2);
-    font-family: 'Syne', sans-serif;
-    font-size: 13px;
+  .len-display {
+    font-family: 'Space Mono', monospace;
+    font-size: 28px;
     font-weight: 700;
-    margin-top: 10px;
-    cursor: pointer;
-    transition: border-color 0.2s;
-    -webkit-tap-highlight-color: transparent;
+    color: var(--accent2);
+    text-align: center;
+    margin-bottom: 4px;
   }
-
-  .copy-btn:hover { border-color: var(--accent); }
 
   .divider { height: 1px; background: var(--border); margin: 16px 0; }
 
@@ -268,6 +284,7 @@
     transition: transform 0.3s ease;
     z-index: 999;
     white-space: nowrap;
+    pointer-events: none;
   }
 
   .toast.show { transform: translateX(-50%) translateY(0); }
@@ -283,57 +300,60 @@
 <div class="card">
   <span class="section-label">Caracteres a incluir</span>
   <div class="checkbox-grid">
-    <label class="cb-item" id="lbl_upper">
+    <label class="cb-item">
       <input type="checkbox" id="cb_upper" checked>
       <span>A-Z mayúsculas<span class="preview">ABCDEFGHIJ...</span></span>
     </label>
-    <label class="cb-item" id="lbl_lower">
+    <label class="cb-item">
       <input type="checkbox" id="cb_lower" checked>
       <span>a-z minúsculas<span class="preview">abcdefghij...</span></span>
     </label>
-    <label class="cb-item" id="lbl_nums">
+    <label class="cb-item">
       <input type="checkbox" id="cb_nums" checked>
       <span>0-9 números<span class="preview">0123456789</span></span>
     </label>
-    <label class="cb-item" id="lbl_sym">
+    <label class="cb-item">
       <input type="checkbox" id="cb_sym">
       <span>símbolos teclado<span class="preview">!@#$%^&amp;*...</span></span>
     </label>
-    <label class="cb-item" id="lbl_space">
+    <label class="cb-item">
       <input type="checkbox" id="cb_space">
       <span>espacios<span class="preview">[ ]</span></span>
     </label>
-    <label class="cb-item" id="lbl_special">
+    <label class="cb-item">
       <input type="checkbox" id="cb_special">
-      <span>especiales unicode<span class="preview">§±°©®™...</span></span>
+      <span>especiales unicode<span class="preview">§±°©®™€...</span></span>
     </label>
-    <label class="cb-item" id="lbl_math">
+    <label class="cb-item">
       <input type="checkbox" id="cb_math">
-      <span>matemáticos<span class="preview">∑∞√∫≠≈...</span></span>
+      <span>matemáticos<span class="preview">∑∞√∫≠≈∆...</span></span>
     </label>
-    <label class="cb-item" id="lbl_arrows">
+    <label class="cb-item">
       <input type="checkbox" id="cb_arrows">
-      <span>flechas &amp; formas<span class="preview">→↑←↓◆▲●...</span></span>
+      <span>flechas &amp; formas<span class="preview">→↑◆▲●★...</span></span>
     </label>
   </div>
 
-  <span class="section-label">Símbolos especiales — clic para agregar al pool</span>
+  <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:12px;">
+    <span class="section-label" style="margin-bottom:0;">Símbolos especiales — clic para activar</span>
+    <button type="button" class="copy-btn" id="select_all_btn" onclick="toggleAllSpecials()" style="width:auto; margin-top:0; padding:6px 14px; font-size:11px; letter-spacing:1px; text-transform:uppercase;">Seleccionar todos</button>
+  </div>
   <div class="special-grid" id="special_grid"></div>
 
   <div class="divider"></div>
 
   <span class="section-label">Caracteres personalizados</span>
-  <input type="text" id="custom_chars" placeholder="escribe o pega cualquier caracter aquí" style="margin-bottom: 16px;">
+  <input type="text" id="custom_chars" class="text-input" placeholder="escribe o pega cualquier caracter aquí" style="margin-bottom:16px;">
 
   <div class="divider"></div>
 
   <div class="len-display" id="len_display">32</div>
   <span class="section-label" style="text-align:center; display:block;">Longitud (1 – 1000)</span>
-  <input type="range" id="len_slider" min="1" max="1000" value="32" step="1">
+  <input type="range" id="len_slider" class="range-input" min="1" max="1000" value="32" step="1">
 
   <div style="margin-top:12px; margin-bottom:16px;">
     <span class="section-label">Valor exacto</span>
-    <input type="number" id="len_input" value="32" min="1" max="1000" step="1">
+    <input type="number" id="len_input" class="text-input" value="32" min="1" max="1000" step="1">
   </div>
 
   <button class="gen-btn" onclick="generate()">Generar</button>
@@ -353,23 +373,24 @@
 const UPPER   = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
 const LOWER   = 'abcdefghijklmnopqrstuvwxyz';
 const NUMS    = '0123456789';
-const SYMS    = '!@#$%^&*()-_=+[]{}|;:,.<>?/~`"\'\\'  ;
-const SPECIAL = '§±°©®™€£¥¢¿¡µ¶†‡•…«»‹›''""„‚—–';
+const SYMS    = '!@#$%^&*()-_=+[]{}|;:,.<>?/~`"\'\\';
+const SPECIAL = '§±°©®™€£¥¢¿¡µ¶†‡•…«»‹›\u2018\u2019\u201C\u201D\u201E\u201A—–';
 const MATH    = '∑∞√∫∂∆∇∏∐∀∃∄∈∉∋∌∩∪⊂⊃⊆⊇⊕⊗⊥∥≠≈≡≤≥≪≫∓±×÷';
 const ARROWS  = '→←↑↓↔↕↗↘↙↖⇒⇐⇑⇓⇔◆◇▲△▼▽●○■□★☆♠♣♥♦';
 
 const SPECIAL_CHARS = [
   '§','±','°','©','®','™','€','£','¥','¢','¿','¡','µ','¶',
-  '†','‡','•','…','«','»','—','–','∑','∞','√','∫','∆','∇',
-  '≠','≈','≡','≤','≥','∈','∉','∩','∪','⊂','⊃','⊕','⊗',
-  '→','←','↑','↓','↔','⇒','⇐','◆','▲','▼','●','○','■','□',
-  '★','☆','♠','♣','♥','♦','α','β','γ','δ','ε','ζ','η','θ',
-  'ι','κ','λ','μ','ν','ξ','π','ρ','σ','τ','υ','φ','χ','ψ','ω',
-  'Α','Β','Γ','Δ','Ε','Ζ','Η','Θ','Ι','Κ','Λ','Μ','Ν','Ξ','Π',
-  'Ρ','Σ','Τ','Υ','Φ','Χ','Ψ','Ω','½','⅓','⅔','¼','¾','⅛','⅜',
-  '⅝','⅞','№','℃','℉','Ω','℃','∂','∏','∐','∀','∃','∄',
-  '⌀','⌂','⌘','⌛','⌚','✓','✗','✘','✦','✧','✩','✪','✫','✬',
-  '❤','❥','❦','❧','☀','☁','☂','☃','☄','☮','☯','☺','☻','♪','♫'
+  '†','‡','•','…','«','»','—','–',
+  '∑','∞','√','∫','∆','∇','≠','≈','≡','≤','≥','∈','∉','∩','∪','⊂','⊃','⊕','⊗',
+  '→','←','↑','↓','↔','⇒','⇐','⇑','⇓',
+  '◆','▲','▼','●','○','■','□','★','☆',
+  '♠','♣','♥','♦','♪','♫',
+  'α','β','γ','δ','ε','ζ','η','θ','ι','κ','λ','μ','ν','ξ','π','ρ','σ','τ','υ','φ','χ','ψ','ω',
+  'Α','Β','Γ','Δ','Ε','Ζ','Η','Θ','Λ','Ξ','Π','Σ','Φ','Ψ','Ω',
+  '½','⅓','⅔','¼','¾','⅛','⅜','⅝','⅞',
+  '✓','✗','✘','✦','✧','✩','✪',
+  '☀','☁','☂','☃','☄','☮','☯','☺','☻',
+  '❤','❥','⌘','№','℃','℉'
 ];
 
 const selectedSpecials = new Set();
@@ -379,8 +400,9 @@ SPECIAL_CHARS.forEach(ch => {
   const btn = document.createElement('button');
   btn.className = 'sp-btn';
   btn.textContent = ch;
-  btn.title = `U+${ch.codePointAt(0).toString(16).toUpperCase().padStart(4,'0')}`;
-  btn.addEventListener('click', () => {
+  btn.type = 'button';
+  btn.title = 'U+' + ch.codePointAt(0).toString(16).toUpperCase().padStart(4,'0');
+  btn.addEventListener('click', function() {
     if (selectedSpecials.has(ch)) {
       selectedSpecials.delete(ch);
       btn.classList.remove('selected');
@@ -392,24 +414,36 @@ SPECIAL_CHARS.forEach(ch => {
   grid.appendChild(btn);
 });
 
+var allSelected = false;
+function toggleAllSpecials() {
+  var btns = document.querySelectorAll('.sp-btn');
+  allSelected = !allSelected;
+  btns.forEach(function(btn) {
+    var ch = btn.textContent;
+    if (allSelected) { selectedSpecials.add(ch); btn.classList.add('selected'); }
+    else { selectedSpecials.delete(ch); btn.classList.remove('selected'); }
+  });
+  document.getElementById('select_all_btn').textContent = allSelected ? 'Deseleccionar todos' : 'Seleccionar todos';
+}
+
 const slider   = document.getElementById('len_slider');
 const numInput = document.getElementById('len_input');
 const display  = document.getElementById('len_display');
 
-slider.addEventListener('input', () => {
+slider.addEventListener('input', function() {
   numInput.value = slider.value;
   display.textContent = slider.value;
 });
 
-numInput.addEventListener('input', () => {
-  let v = Math.min(1000, Math.max(1, parseInt(numInput.value) || 1));
+numInput.addEventListener('input', function() {
+  var v = Math.min(1000, Math.max(1, parseInt(numInput.value) || 1));
   numInput.value = v;
   slider.value = v;
   display.textContent = v;
 });
 
 function generate() {
-  let charset = '';
+  var charset = '';
   if (document.getElementById('cb_upper').checked)   charset += UPPER;
   if (document.getElementById('cb_lower').checked)   charset += LOWER;
   if (document.getElementById('cb_nums').checked)    charset += NUMS;
@@ -418,11 +452,11 @@ function generate() {
   if (document.getElementById('cb_special').checked) charset += SPECIAL;
   if (document.getElementById('cb_math').checked)    charset += MATH;
   if (document.getElementById('cb_arrows').checked)  charset += ARROWS;
-  charset += [...selectedSpecials].join('');
-  const custom = document.getElementById('custom_chars').value;
+  selectedSpecials.forEach(function(c) { charset += c; });
+  var custom = document.getElementById('custom_chars').value;
   if (custom) charset += custom;
 
-  const unique = [...new Set(charset)].join('');
+  var unique = Array.from(new Set(Array.from(charset))).join('');
 
   if (!unique) {
     document.getElementById('result_card').style.display = 'block';
@@ -430,29 +464,29 @@ function generate() {
     return;
   }
 
-  const len = parseInt(slider.value);
-  let result = '';
-  for (let i = 0; i < len; i++) {
+  var len = parseInt(slider.value);
+  var result = '';
+  for (var i = 0; i < len; i++) {
     result += unique[Math.floor(Math.random() * unique.length)];
   }
 
   document.getElementById('result').textContent = result;
-  document.getElementById('stats').textContent = `${len} caracteres · pool: ${unique.length} posibles`;
+  document.getElementById('stats').textContent = len + ' caracteres · pool: ' + unique.length + ' posibles';
   document.getElementById('result_card').style.display = 'block';
 }
 
 function copyResult() {
-  const text = document.getElementById('result').textContent;
+  var text = document.getElementById('result').textContent;
   if (!text) return;
   if (navigator.clipboard) {
-    navigator.clipboard.writeText(text).then(showToast).catch(() => fallbackCopy(text));
+    navigator.clipboard.writeText(text).then(showToast).catch(function() { fallbackCopy(text); });
   } else {
     fallbackCopy(text);
   }
 }
 
 function fallbackCopy(text) {
-  const ta = document.createElement('textarea');
+  var ta = document.createElement('textarea');
   ta.value = text;
   ta.style.position = 'fixed';
   ta.style.opacity = '0';
@@ -465,9 +499,9 @@ function fallbackCopy(text) {
 }
 
 function showToast() {
-  const t = document.getElementById('toast');
+  var t = document.getElementById('toast');
   t.classList.add('show');
-  setTimeout(() => t.classList.remove('show'), 2000);
+  setTimeout(function() { t.classList.remove('show'); }, 2000);
 }
 </script>
 </body>
