@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>JGM String Generator</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;700;800&display=swap');
+
+  :root {
+    --bg: #0a0a0f;
+    --surface: #12121a;
+    --surface2: #1a1a26;
+    --border: #2a2a40;
+    --accent: #7b5cf0;
+    --accent2: #a78bfa;
+    --green: #4ade80;
+    --text: #e2e8f0;
+    --muted: #64748b;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Syne', sans-serif;
+    min-height: 100vh;
+    padding: 20px 16px 40px;
+  }
+
+  header {
+    text-align: center;
+    margin-bottom: 28px;
+    padding-top: 8px;
+  }
+
+  header h1 {
+    font-size: 28px;
+    font-weight: 800;
+    background: linear-gradient(135deg, var(--accent2), #c4b5fd);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    letter-spacing: -0.5px;
+  }
+
+  header p {
+    font-size: 13px;
+    color: var(--muted);
+    margin-top: 4px;
+    font-family: 'Space Mono', monospace;
+  }
+
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 20px;
+    margin-bottom: 16px;
+  }
+
+  .section-label {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--accent2);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+    display: block;
+  }
+
+  input[type="text"], input[type="number"] {
+    width: 100%;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px 16px;
+    color: var(--text);
+    font-family: 'Space Mono', monospace;
+    font-size: 15px;
+    outline: none;
+    transition: border-color 0.2s;
+    -webkit-appearance: none;
+  }
+
+  input:focus { border-color: var(--accent); }
+
+  input[type="range"] {
+    width: 100%;
+    -webkit-appearance: none;
+    height: 4px;
+    background: var(--border);
+    border-radius: 2px;
+    outline: none;
+    margin: 8px 0;
+  }
+
+  input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 18px;
+    height: 18px;
+    background: var(--accent);
+    border-radius: 50%;
+    cursor: pointer;
+  }
+
+  .checkbox-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 16px;
+  }
+
+  .cb-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 10px 14px;
+    cursor: pointer;
+    transition: border-color 0.2s;
+  }
+
+  .cb-item:hover { border-color: var(--accent); }
+
+  .cb-item input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+    accent-color: var(--accent);
+    cursor: pointer;
+    flex-shrink: 0;
+  }
+
+  .cb-item span {
+    font-size: 13px;
+    color: var(--text);
+    font-family: 'Space Mono', monospace;
+  }
+
+  .row {
+    display: flex;
+    gap: 12px;
+    align-items: flex-end;
+    margin-bottom: 16px;
+  }
+
+  .col { flex: 1; }
+  .col-small { flex: 0 0 100px; }
+
+  .len-display {
+    font-family: 'Space Mono', monospace;
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--accent2);
+    text-align: center;
+    margin-bottom: 6px;
+  }
+
+  button {
+    width: 100%;
+    background: var(--accent);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    padding: 16px;
+    font-family: 'Syne', sans-serif;
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+    letter-spacing: 0.5px;
+    transition: opacity 0.15s, transform 0.1s;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  button:active { opacity: 0.85; transform: scale(0.98); }
+
+  .result-box {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px;
+    font-family: 'Space Mono', monospace;
+    font-size: 13px;
+    color: var(--green);
+    word-break: break-all;
+    line-height: 1.7;
+    min-height: 80px;
+    margin-top: 8px;
+  }
+
+  .stats {
+    font-size: 12px;
+    color: var(--muted);
+    font-family: 'Space Mono', monospace;
+    margin-top: 8px;
+  }
+
+  .copy-btn {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 12px;
+    color: var(--accent2);
+    font-size: 13px;
+    font-weight: 700;
+    margin-top: 10px;
+  }
+
+  .divider {
+    height: 1px;
+    background: var(--border);
+    margin: 16px 0;
+  }
+
+  .tag {
+    display: inline-block;
+    background: rgba(123, 92, 240, 0.15);
+    color: var(--accent2);
+    border: 1px solid rgba(123, 92, 240, 0.3);
+    border-radius: 6px;
+    padding: 3px 10px;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+    font-family: 'Space Mono', monospace;
+  }
+
+  .toast {
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%) translateY(80px);
+    background: var(--green);
+    color: #0a0a0f;
+    padding: 12px 24px;
+    border-radius: 100px;
+    font-weight: 700;
+    font-size: 14px;
+    font-family: 'Syne', sans-serif;
+    transition: transform 0.3s ease;
+    z-index: 999;
+    white-space: nowrap;
+  }
+
+  .toast.show { transform: translateX(-50%) translateY(0); }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>JGM String Generator</h1>
+  <p>generador de texto aleatorio</p>
+</header>
+
+<div class="card">
+  <span class="section-label">Caracteres a incluir</span>
+  <div class="checkbox-grid">
+    <label class="cb-item"><input type="checkbox" id="cb_upper" checked><span>A-Z mayúsculas</span></label>
+    <label class="cb-item"><input type="checkbox" id="cb_lower" checked><span>a-z minúsculas</span></label>
+    <label class="cb-item"><input type="checkbox" id="cb_nums" checked><span>0-9 números</span></label>
+    <label class="cb-item"><input type="checkbox" id="cb_sym"><span>!@#$ símbolos</span></label>
+    <label class="cb-item"><input type="checkbox" id="cb_space"><span>espacios</span></label>
+  </div>
+
+  <span class="section-label">Caracteres personalizados</span>
+  <input type="text" id="custom_chars" placeholder="ej: ABC123!@#" style="margin-bottom: 16px;">
+
+  <div class="divider"></div>
+
+  <div class="len-display" id="len_display">32</div>
+  <span class="section-label" style="text-align:center;">Longitud (1 – 1000)</span>
+  <input type="range" id="len_slider" min="1" max="1000" value="32" step="1">
+
+  <div class="row" style="margin-top:12px;">
+    <div class="col">
+      <span class="section-label">Valor exacto</span>
+      <input type="number" id="len_input" value="32" min="1" max="1000" step="1">
+    </div>
+  </div>
+
+  <button onclick="generate()">Generar</button>
+</div>
+
+<div class="card" id="result_card" style="display:none;">
+  <div class="tag">resultado</div>
+
+  <span class="section-label">Texto generado</span>
+  <div class="result-box" id="result"></div>
+  <div class="stats" id="stats"></div>
+
+  <button class="copy-btn" onclick="copyResult()">Copiar texto</button>
+</div>
+
+<div class="toast" id="toast">Copiado!</div>
+
+<script>
+const UPPER = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+const LOWER = 'abcdefghijklmnopqrstuvwxyz';
+const NUMS  = '0123456789';
+const SYMS  = '!@#$%^&*()-_=+[]{}|;:,.<>?/~`"\'\\';
+
+const slider   = document.getElementById('len_slider');
+const numInput = document.getElementById('len_input');
+const display  = document.getElementById('len_display');
+
+slider.addEventListener('input', () => {
+  numInput.value = slider.value;
+  display.textContent = slider.value;
+});
+
+numInput.addEventListener('input', () => {
+  let v = Math.min(1000, Math.max(1, parseInt(numInput.value) || 1));
+  numInput.value = v;
+  slider.value = v;
+  display.textContent = v;
+});
+
+function generate() {
+  let charset = '';
+  if (document.getElementById('cb_upper').checked) charset += UPPER;
+  if (document.getElementById('cb_lower').checked) charset += LOWER;
+  if (document.getElementById('cb_nums').checked)  charset += NUMS;
+  if (document.getElementById('cb_sym').checked)   charset += SYMS;
+  if (document.getElementById('cb_space').checked) charset += ' ';
+  const custom = document.getElementById('custom_chars').value;
+  if (custom) charset += custom;
+
+  if (!charset) {
+    document.getElementById('result_card').style.display = 'block';
+    document.getElementById('result').textContent = 'Selecciona al menos un tipo de caracter.';
+    return;
+  }
+
+  const len = parseInt(slider.value);
+  let result = '';
+  for (let i = 0; i < len; i++) {
+    result += charset[Math.floor(Math.random() * charset.length)];
+  }
+
+  document.getElementById('result').textContent = result;
+  document.getElementById('stats').textContent = `${len} caracteres · charset: ${charset.length} posibles`;
+  document.getElementById('result_card').style.display = 'block';
+}
+
+function copyResult() {
+  const text = document.getElementById('result').textContent;
+  if (!text) return;
+  if (navigator.clipboard) {
+    navigator.clipboard.writeText(text).then(showToast).catch(() => fallbackCopy(text));
+  } else {
+    fallbackCopy(text);
+  }
+}
+
+function fallbackCopy(text) {
+  const ta = document.createElement('textarea');
+  ta.value = text;
+  ta.style.position = 'fixed';
+  ta.style.opacity = '0';
+  document.body.appendChild(ta);
+  ta.focus();
+  ta.select();
+  document.execCommand('copy');
+  document.body.removeChild(ta);
+  showToast();
+}
+
+function showToast() {
+  const t = document.getElementById('toast');
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2000);
+}
+</script>
+</body>
+</html>
