@@ -6,198 +6,64 @@
 <title>JGM XOR Encryptor</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;700;800&display=swap');
-
   :root {
-    --bg: #0a0a0f;
-    --surface: #12121a;
-    --surface2: #1a1a26;
-    --border: #2a2a40;
-    --accent: #7b5cf0;
-    --accent2: #a78bfa;
-    --green: #4ade80;
-    --text: #e2e8f0;
-    --muted: #64748b;
+    --bg: #0a0a0f; --surface: #12121a; --surface2: #1a1a26;
+    --border: #2a2a40; --accent: #7b5cf0; --accent2: #a78bfa;
+    --green: #4ade80; --red: #f87171; --text: #e2e8f0; --muted: #64748b;
   }
-
   * { box-sizing: border-box; margin: 0; padding: 0; }
-
-  body {
-    background: var(--bg);
-    color: var(--text);
-    font-family: 'Syne', sans-serif;
-    min-height: 100vh;
-    padding: 20px 16px 40px;
+  body { background: var(--bg); color: var(--text); font-family: 'Syne', sans-serif; min-height: 100vh; padding: 20px 16px 40px; }
+  header { text-align: center; margin-bottom: 28px; padding-top: 8px; }
+  header h1 { font-size: 28px; font-weight: 800; background: linear-gradient(135deg, var(--accent2), #c4b5fd); -webkit-background-clip: text; -webkit-text-fill-color: transparent; letter-spacing: -0.5px; }
+  header p { font-size: 13px; color: var(--muted); margin-top: 4px; font-family: 'Space Mono', monospace; }
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 20px; margin-bottom: 16px; }
+  .section-label { font-size: 12px; font-weight: 700; color: var(--accent2); letter-spacing: 1px; text-transform: uppercase; margin-bottom: 8px; display: block; }
+  .text-input {
+    width: 100%; background: var(--surface2); border: 1px solid var(--border);
+    border-radius: 10px; padding: 14px 16px; color: var(--text);
+    font-family: 'Space Mono', monospace; font-size: 15px; outline: none;
+    transition: border-color 0.2s; -webkit-appearance: none; appearance: none; display: block;
   }
-
-  header {
-    text-align: center;
-    margin-bottom: 28px;
-    padding-top: 8px;
+  .text-input:focus { border-color: var(--accent); }
+  .row { display: flex; gap: 12px; margin-bottom: 16px; }
+  .col { flex: 1; }
+  .col-small { flex: 0 0 100px; }
+  .btn-row { display: flex; gap: 10px; }
+  .enc-btn {
+    flex: 1; background: var(--accent); color: white; border: none;
+    border-radius: 12px; padding: 16px; font-family: 'Syne', sans-serif;
+    font-size: 15px; font-weight: 700; cursor: pointer; letter-spacing: 0.5px;
+    transition: opacity 0.15s, transform 0.1s; -webkit-tap-highlight-color: transparent;
   }
-
-  header h1 {
-    font-size: 28px;
-    font-weight: 800;
-    background: linear-gradient(135deg, var(--accent2), #c4b5fd);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    letter-spacing: -0.5px;
-  }
-
-  header p {
-    font-size: 13px;
-    color: var(--muted);
-    margin-top: 4px;
-    font-family: 'Space Mono', monospace;
-  }
-
-  .card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 16px;
-    padding: 20px;
-    margin-bottom: 16px;
-  }
-
-  label {
-    display: block;
-    font-size: 12px;
-    font-weight: 700;
-    color: var(--accent2);
-    letter-spacing: 1px;
-    text-transform: uppercase;
-    margin-bottom: 8px;
-  }
-
-  input[type="text"], input[type="number"] {
-    width: 100%;
-    background: var(--surface2);
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    padding: 14px 16px;
-    color: var(--text);
-    font-family: 'Space Mono', monospace;
-    font-size: 15px;
-    outline: none;
-    transition: border-color 0.2s;
-    -webkit-appearance: none;
-  }
-
-  input:focus {
-    border-color: var(--accent);
-  }
-
-  .row {
-    display: flex;
-    gap: 12px;
-    margin-bottom: 16px;
-  }
-
-  .row .col { flex: 1; }
-  .row .col-small { flex: 0 0 100px; }
-
-  button {
-    width: 100%;
-    background: var(--accent);
-    color: white;
-    border: none;
-    border-radius: 12px;
-    padding: 16px;
-    font-family: 'Syne', sans-serif;
-    font-size: 16px;
-    font-weight: 700;
-    cursor: pointer;
-    letter-spacing: 0.5px;
-    transition: opacity 0.15s, transform 0.1s;
+  .dec-btn {
+    flex: 1; background: var(--surface2); color: var(--accent2);
+    border: 1px solid var(--border); border-radius: 12px; padding: 16px;
+    font-family: 'Syne', sans-serif; font-size: 15px; font-weight: 700;
+    cursor: pointer; letter-spacing: 0.5px;
+    transition: opacity 0.15s, transform 0.1s, border-color 0.2s;
     -webkit-tap-highlight-color: transparent;
   }
-
-  button:active { opacity: 0.85; transform: scale(0.98); }
-
+  .dec-btn:hover { border-color: var(--accent); }
+  .enc-btn:active, .dec-btn:active { opacity: 0.85; transform: scale(0.98); }
   .result-section { display: none; }
   .result-section.visible { display: block; }
-
-  .result-label {
-    font-size: 11px;
-    font-weight: 700;
-    color: var(--muted);
-    letter-spacing: 1px;
-    text-transform: uppercase;
-    margin-bottom: 6px;
-    margin-top: 16px;
-  }
-
-  .result-box {
-    background: var(--surface2);
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    padding: 14px 16px;
-    font-family: 'Space Mono', monospace;
-    font-size: 12px;
-    color: var(--green);
-    word-break: break-all;
-    line-height: 1.6;
-    white-space: pre-wrap;
-  }
-
-  .verify-box {
-    background: var(--surface2);
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    padding: 12px 16px;
-    font-family: 'Space Mono', monospace;
-    font-size: 14px;
-    color: var(--accent2);
-  }
-
+  .result-label { font-size: 11px; font-weight: 700; color: var(--muted); letter-spacing: 1px; text-transform: uppercase; margin-bottom: 6px; margin-top: 16px; }
+  .result-box { background: var(--surface2); border: 1px solid var(--border); border-radius: 10px; padding: 14px 16px; font-family: 'Space Mono', monospace; font-size: 12px; color: var(--green); word-break: break-all; line-height: 1.6; white-space: pre-wrap; }
+  .result-box.decrypt-result { color: var(--accent2); font-size: 16px; }
+  .verify-box { background: var(--surface2); border: 1px solid var(--border); border-radius: 10px; padding: 12px 16px; font-family: 'Space Mono', monospace; font-size: 14px; color: var(--accent2); }
   .copy-btn {
-    background: var(--surface2);
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    padding: 12px;
-    color: var(--accent2);
-    font-size: 13px;
-    font-weight: 700;
-    margin-top: 8px;
-    width: 100%;
+    background: var(--surface2); border: 1px solid var(--border);
+    border-radius: 10px; padding: 12px; color: var(--accent2);
+    font-family: 'Syne', sans-serif; font-size: 13px; font-weight: 700;
+    margin-top: 8px; width: 100%; cursor: pointer;
+    transition: border-color 0.2s; -webkit-tap-highlight-color: transparent;
   }
-
-  .divider {
-    height: 1px;
-    background: var(--border);
-    margin: 16px 0;
-  }
-
-  .tag {
-    display: inline-block;
-    background: rgba(123, 92, 240, 0.15);
-    color: var(--accent2);
-    border: 1px solid rgba(123, 92, 240, 0.3);
-    border-radius: 6px;
-    padding: 3px 10px;
-    font-size: 11px;
-    font-weight: 700;
-    letter-spacing: 1px;
-    text-transform: uppercase;
-    margin-bottom: 12px;
-  }
-
-  .toast {
-    position: fixed;
-    bottom: 24px;
-    left: 50%;
-    transform: translateX(-50%) translateY(80px);
-    background: var(--green);
-    color: #0a0a0f;
-    padding: 12px 24px;
-    border-radius: 100px;
-    font-weight: 700;
-    font-size: 14px;
-    transition: transform 0.3s ease;
-    z-index: 999;
-    white-space: nowrap;
-  }
-
+  .copy-btn:hover { border-color: var(--accent); }
+  .divider { height: 1px; background: var(--border); margin: 16px 0; }
+  .tag { display: inline-block; background: rgba(123, 92, 240, 0.15); color: var(--accent2); border: 1px solid rgba(123, 92, 240, 0.3); border-radius: 6px; padding: 3px 10px; font-size: 11px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 12px; font-family: 'Space Mono', monospace; }
+  .tag.decrypt-tag { background: rgba(74, 222, 128, 0.1); color: var(--green); border-color: rgba(74, 222, 128, 0.3); }
+  .mode-indicator { font-size: 11px; color: var(--muted); font-family: 'Space Mono', monospace; margin-top: 6px; }
+  .toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(80px); background: var(--green); color: #0a0a0f; padding: 12px 24px; border-radius: 100px; font-weight: 700; font-size: 14px; font-family: 'Syne', sans-serif; transition: transform 0.3s ease; z-index: 999; white-space: nowrap; pointer-events: none; }
   .toast.show { transform: translateX(-50%) translateY(0); }
 </style>
 </head>
@@ -211,19 +77,23 @@
 <div class="card">
   <div class="row">
     <div class="col">
-      <label>Texto a encriptar</label>
-      <input type="text" id="inputText" placeholder="ej: MSN PACK" autocomplete="off" autocorrect="off" spellcheck="false">
+      <span class="section-label">Texto</span>
+      <input type="text" id="inputText" class="text-input" placeholder='ej: MSN PACK o texto encriptado' autocomplete="off" autocorrect="off" spellcheck="false">
     </div>
     <div class="col-small">
-      <label>Clave XOR</label>
-      <input type="number" id="xorKey" value="42" min="1" max="255">
+      <span class="section-label">Clave XOR</span>
+      <input type="number" id="xorKey" class="text-input" value="42" min="1" max="255">
     </div>
   </div>
-  <button onclick="encrypt()">Encriptar</button>
+  <div class="btn-row">
+    <button class="enc-btn" onclick="encrypt()">Encriptar</button>
+    <button class="dec-btn" onclick="decrypt()">Desencriptar</button>
+  </div>
 </div>
 
-<div class="card result-section" id="resultCard">
-  <div class="tag">resultado</div>
+<!-- Resultado encriptar -->
+<div class="card result-section" id="encryptCard">
+  <div class="tag">encriptado</div>
 
   <div class="result-label">String encriptado</div>
   <div class="result-box" id="encryptedStr"></div>
@@ -236,17 +106,65 @@
 
   <div class="divider"></div>
 
-  <div class="result-label">Verificación</div>
+  <div class="result-label">Verificación (desencriptado debe = original)</div>
   <div class="verify-box" id="verifyStr"></div>
+</div>
+
+<!-- Resultado desencriptar -->
+<div class="card result-section" id="decryptCard">
+  <div class="tag decrypt-tag">desencriptado</div>
+
+  <div class="result-label">Texto original</div>
+  <div class="result-box decrypt-result" id="decryptedStr"></div>
+
+  <button class="copy-btn" onclick="copyDecrypted()">Copiar texto</button>
 </div>
 
 <div class="toast" id="toast">Copiado!</div>
 
 <script>
+function xorProcess(text, key) {
+  // Parsea escape sequences tipo \uXXXX y \\ y \" antes de procesar
+  let chars = [];
+  let i = 0;
+  while (i < text.length) {
+    if (text[i] === '\\' && i + 1 < text.length) {
+      if (text[i+1] === 'u' && i + 5 < text.length) {
+        const hex = text.substring(i+2, i+6);
+        if (/^[0-9a-fA-F]{4}$/.test(hex)) {
+          chars.push(parseInt(hex, 16));
+          i += 6;
+          continue;
+        }
+      } else if (text[i+1] === 'n') {
+        chars.push(10);
+        i += 2;
+        continue;
+      } else if (text[i+1] === '\\') {
+        chars.push(92);
+        i += 2;
+        continue;
+      } else if (text[i+1] === '"') {
+        chars.push(34);
+        i += 2;
+        continue;
+      }
+    }
+    chars.push(text.charCodeAt(i));
+    i++;
+  }
+
+  let result = '';
+  for (let j = 0; j < chars.length; j++) {
+    result += String.fromCharCode(chars[j] ^ key);
+  }
+  return result;
+}
+
 function encrypt() {
-  const text = document.getElementById('inputText').value.trim();
+  const text = document.getElementById('inputText').value;
   const key = parseInt(document.getElementById('xorKey').value) || 42;
-  if (!text) return;
+  if (!text.trim()) return;
 
   let encryptedChars = '';
   for (let i = 0; i < text.length; i++) {
@@ -263,21 +181,43 @@ function encrypt() {
   }
 
   const keyHex = '0x' + key.toString(16);
-  const smali = `    const-string v0, "ALIAS"\n    const-string v1, "${encryptedChars}"\n    const/16 v2, ${keyHex}\n    invoke-static {v1, v2}, Lc4/c;->c(Ljava/lang/String;I)Ljava/lang/String;\n    move-result-object v1\n    invoke-virtual {p0, v0, v1}, Ljava/lang/String;->replace(Ljava/lang/CharSequence;Ljava/lang/CharSequence;)Ljava/lang/String;\n    move-result-object p0`;
-
-  let verify = '';
-  for (let i = 0; i < text.length; i++) {
-    verify += String.fromCharCode(text.charCodeAt(i) ^ key ^ key);
-  }
+  const smali = `    const-string v8, "${encryptedChars}"\n    const/16 v9, ${keyHex}\n    invoke-static {v8, v9}, Lc4/c;->c(Ljava/lang/String;I)Ljava/lang/String;\n    move-result-object v8`;
 
   document.getElementById('encryptedStr').textContent = '"' + encryptedChars + '"';
   document.getElementById('smaliCode').textContent = smali;
-  document.getElementById('verifyStr').textContent = verify + ' ✓';
-  document.getElementById('resultCard').classList.add('visible');
+  document.getElementById('verifyStr').textContent = xorProcess(encryptedChars, key) + ' ✓';
+
+  document.getElementById('encryptCard').classList.add('visible');
+  document.getElementById('decryptCard').classList.remove('visible');
+}
+
+function decrypt() {
+  const text = document.getElementById('inputText').value;
+  const key = parseInt(document.getElementById('xorKey').value) || 42;
+  if (!text.trim()) return;
+
+  // Quita comillas si el usuario pegó el string con comillas
+  let clean = text.trim();
+  if (clean.startsWith('"') && clean.endsWith('"')) {
+    clean = clean.slice(1, -1);
+  }
+
+  const result = xorProcess(clean, key);
+
+  document.getElementById('decryptedStr').textContent = result;
+  document.getElementById('decryptCard').classList.add('visible');
+  document.getElementById('encryptCard').classList.remove('visible');
 }
 
 function copySmali() {
-  const text = document.getElementById('smaliCode').textContent;
+  copyText(document.getElementById('smaliCode').textContent);
+}
+
+function copyDecrypted() {
+  copyText(document.getElementById('decryptedStr').textContent);
+}
+
+function copyText(text) {
   if (navigator.clipboard) {
     navigator.clipboard.writeText(text).then(showToast).catch(() => fallbackCopy(text));
   } else {
@@ -304,7 +244,7 @@ function showToast() {
   setTimeout(() => t.classList.remove('show'), 2000);
 }
 
-document.getElementById('inputText').addEventListener('keydown', e => {
+document.getElementById('inputText').addEventListener('keydown', function(e) {
   if (e.key === 'Enter') encrypt();
 });
 </script>
