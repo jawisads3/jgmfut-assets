@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>JGM Image Fade</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;700;800&display=swap');
+  :root {
+    --bg: #0a0a0f; --surface: #12121a; --surface2: #1a1a26;
+    --border: #2a2a40; --accent: #7b5cf0; --accent2: #a78bfa;
+    --green: #4ade80; --text: #e2e8f0; --muted: #64748b;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--text); font-family: 'Syne', sans-serif; min-height: 100vh; padding: 20px 16px 40px; }
+  header { text-align: center; margin-bottom: 24px; padding-top: 8px; }
+  header h1 { font-size: 28px; font-weight: 800; background: linear-gradient(135deg, var(--accent2), #c4b5fd); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+  header p { font-size: 13px; color: var(--muted); margin-top: 4px; font-family: 'Space Mono', monospace; }
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 20px; margin-bottom: 16px; }
+  .section-label { font-size: 12px; font-weight: 700; color: var(--accent2); letter-spacing: 1px; text-transform: uppercase; margin-bottom: 10px; display: block; }
+
+  /* File input visible y estilizado */
+  .file-label {
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 10px; width: 100%; padding: 32px 16px;
+    background: var(--surface2); border: 2px dashed var(--border);
+    border-radius: 12px; cursor: pointer; transition: border-color 0.2s;
+  }
+  .file-label:hover { border-color: var(--accent); }
+  .file-label span { font-size: 13px; color: var(--muted); font-family: 'Space Mono', monospace; }
+  .file-label span b { color: var(--accent2); }
+  /* Input VISIBLE para máxima compatibilidad móvil */
+  #fileInput {
+    display: block; width: 100%; margin-top: 8px;
+    font-family: 'Space Mono', monospace; font-size: 13px;
+    color: var(--muted); background: var(--surface2);
+    border: 1px solid var(--border); border-radius: 8px;
+    padding: 10px; cursor: pointer;
+  }
+
+  .color-row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+  .color-swatch {
+    width: 36px; height: 36px; border-radius: 8px; border: 2px solid var(--border);
+    cursor: pointer; transition: border-color 0.15s, transform 0.1s; flex-shrink: 0;
+  }
+  .color-swatch:active { transform: scale(0.92); }
+  .color-swatch.active { border-color: var(--accent2); box-shadow: 0 0 0 2px var(--accent); }
+  .custom-wrap { display: flex; flex-direction: column; align-items: center; gap: 3px; }
+  .custom-wrap input[type="color"] {
+    width: 36px; height: 36px; border: 2px solid var(--border); border-radius: 8px;
+    cursor: pointer; padding: 2px; background: var(--surface2);
+  }
+  .custom-wrap span { font-size: 10px; color: var(--muted); font-family: 'Space Mono', monospace; }
+
+  .ctrl-row { display: flex; align-items: center; gap: 12px; margin-top: 14px; }
+  .ctrl-lbl { font-size: 12px; color: var(--muted); font-family: 'Space Mono', monospace; min-width: 80px; }
+  .ctrl-val { font-size: 12px; color: var(--accent2); font-family: 'Space Mono', monospace; min-width: 38px; text-align: right; }
+  input[type="range"] {
+    flex: 1; -webkit-appearance: none; appearance: none;
+    height: 4px; background: var(--border); border-radius: 2px; outline: none; cursor: pointer;
+  }
+  input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none; width: 22px; height: 22px;
+    background: var(--accent); border-radius: 50%; cursor: pointer;
+  }
+  input[type="range"]::-moz-range-thumb {
+    width: 22px; height: 22px; background: var(--accent); border-radius: 50%; border: none; cursor: pointer;
+  }
+
+  .canvas-wrap {
+    position: relative; border-radius: 12px; overflow: hidden;
+    background: #111; border: 1px solid var(--border);
+  }
+  .canvas-wrap canvas { display: block; width: 100%; height: auto; pointer-events: none; }
+
+  .drag-handle {
+    position: absolute; left: 0; right: 0;
+    height: 44px; margin-top: -22px;
+    cursor: ns-resize; touch-action: none;
+    display: flex; align-items: center; justify-content: center;
+    z-index: 10;
+  }
+  .handle-line {
+    position: absolute; left: 0; right: 0; top: 50%; height: 3px; margin-top: -1px;
+    pointer-events: none;
+  }
+  .handle-pill {
+    font-size: 11px; font-family: 'Space Mono', monospace; font-weight: 700;
+    padding: 4px 12px; border-radius: 20px; white-space: nowrap;
+    pointer-events: none; color: white; position: relative; z-index: 1;
+  }
+  #handleStart .handle-line { background: rgba(167,139,250,0.9); }
+  #handleStart .handle-pill { background: var(--accent); }
+  #handleEnd .handle-line { background: rgba(74,222,128,0.9); }
+  #handleEnd .handle-pill { background: #16a34a; }
+
+  .legend { display: flex; gap: 16px; margin-top: 10px; justify-content: center; flex-wrap: wrap; }
+  .legend-item { display: flex; align-items: center; gap: 6px; font-size: 11px; color: var(--muted); font-family: 'Space Mono', monospace; }
+  .legend-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+
+  .dl-btn {
+    width: 100%; background: var(--accent); color: white; border: none;
+    border-radius: 12px; padding: 16px; font-family: 'Syne', sans-serif;
+    font-size: 16px; font-weight: 700; cursor: pointer; margin-top: 14px;
+    transition: opacity 0.15s, transform 0.1s; -webkit-tap-highlight-color: transparent;
+  }
+  .dl-btn:active { opacity: 0.85; transform: scale(0.98); }
+
+  .toast {
+    position: fixed; bottom: 24px; left: 50%;
+    transform: translateX(-50%) translateY(80px);
+    background: var(--green); color: #0a0a0f; padding: 12px 24px;
+    border-radius: 100px; font-weight: 700; font-size: 14px;
+    font-family: 'Syne', sans-serif; transition: transform 0.3s;
+    z-index: 999; white-space: nowrap; pointer-events: none;
+  }
+  .toast.show { transform: translateX(-50%) translateY(0); }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>JGM Image Fade</h1>
+  <p>arrastra las líneas sobre la imagen</p>
+</header>
+
+<div class="card">
+  <span class="section-label">Imagen</span>
+  <div class="file-label">
+    <div style="font-size:36px;">🖼️</div>
+    <span>Selecciona una imagen<br><b>PNG · JPG · WEBP</b></span>
+  </div>
+  <input type="file" id="fileInput" accept="image/*">
+</div>
+
+<div class="card" id="controlsCard" style="display:none;">
+  <span class="section-label">Color del fade</span>
+  <div class="color-row">
+    <div class="color-swatch active" style="background:#000000" data-color="#000000" onclick="pickSwatch(this)"></div>
+    <div class="color-swatch" style="background:#ffffff" data-color="#ffffff" onclick="pickSwatch(this)"></div>
+    <div class="color-swatch" style="background:#1a1a2e" data-color="#1a1a2e" onclick="pickSwatch(this)"></div>
+    <div class="color-swatch" style="background:#2b2b2b" data-color="#2b2b2b" onclick="pickSwatch(this)"></div>
+    <div class="color-swatch" style="background:#3d1a00" data-color="#3d1a00" onclick="pickSwatch(this)"></div>
+    <div class="color-swatch" style="background:#001a3d" data-color="#001a3d" onclick="pickSwatch(this)"></div>
+    <div class="custom-wrap">
+      <input type="color" id="customColor" value="#000000" oninput="pickCustom(this.value)">
+      <span>custom</span>
+    </div>
+  </div>
+  <div class="ctrl-row">
+    <span class="ctrl-lbl">Opacidad</span>
+    <input type="range" id="opacitySlider" min="0" max="100" value="100"
+      oninput="render(); document.getElementById('opacityVal').textContent=this.value+'%'">
+    <span class="ctrl-val" id="opacityVal">100%</span>
+  </div>
+</div>
+
+<div class="card" id="previewCard" style="display:none;">
+  <span class="section-label">Vista previa — arrastra las líneas</span>
+  <div class="canvas-wrap" id="canvasWrap">
+    <canvas id="canvas"></canvas>
+    <div class="drag-handle" id="handleStart" style="top:60%">
+      <div class="handle-line"></div>
+      <div class="handle-pill">↕ inicio fade</div>
+    </div>
+    <div class="drag-handle" id="handleEnd" style="top:85%">
+      <div class="handle-line"></div>
+      <div class="handle-pill">↕ fin fade</div>
+    </div>
+  </div>
+  <div class="legend">
+    <div class="legend-item"><div class="legend-dot" style="background:var(--accent)"></div>morado = inicio</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#16a34a"></div>verde = fin (opaco)</div>
+  </div>
+  <button class="dl-btn" onclick="download()">⬇ Descargar PNG</button>
+</div>
+
+<div class="toast" id="toast">Descargado!</div>
+
+<script>
+let img = null;
+let color = '#000000';
+let startPct = 0.60;
+let endPct   = 0.85;
+let activeLine = null;
+
+document.getElementById('fileInput').addEventListener('change', function() {
+  if (this.files && this.files[0]) load(this.files[0]);
+});
+
+function load(file) {
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    const i = new Image();
+    i.onload = function() {
+      img = i;
+      document.getElementById('controlsCard').style.display = 'block';
+      document.getElementById('previewCard').style.display = 'block';
+      render();
+    };
+    i.src = e.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+
+function pickSwatch(el) {
+  color = el.dataset.color;
+  document.querySelectorAll('.color-swatch').forEach(s => s.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('customColor').value = color;
+  render();
+}
+function pickCustom(c) {
+  color = c;
+  document.querySelectorAll('.color-swatch').forEach(s => s.classList.remove('active'));
+  render();
+}
+
+const handleStart = document.getElementById('handleStart');
+const handleEnd   = document.getElementById('handleEnd');
+const canvasWrap  = document.getElementById('canvasWrap');
+
+handleStart.addEventListener('mousedown',  e => { activeLine = 'start'; e.preventDefault(); });
+handleStart.addEventListener('touchstart', e => { activeLine = 'start'; e.preventDefault(); }, { passive: false });
+handleEnd.addEventListener('mousedown',    e => { activeLine = 'end';   e.preventDefault(); });
+handleEnd.addEventListener('touchstart',   e => { activeLine = 'end';   e.preventDefault(); }, { passive: false });
+
+document.addEventListener('mousemove', onMove);
+document.addEventListener('touchmove', onMove, { passive: false });
+document.addEventListener('mouseup',   () => { activeLine = null; });
+document.addEventListener('touchend',  () => { activeLine = null; });
+
+function onMove(e) {
+  if (!activeLine) return;
+  e.preventDefault();
+  const rect = canvasWrap.getBoundingClientRect();
+  const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+  let pct = (clientY - rect.top) / rect.height;
+  pct = Math.max(0.01, Math.min(0.99, pct));
+  if (activeLine === 'start') {
+    startPct = Math.min(pct, endPct - 0.03);
+    handleStart.style.top = (startPct * 100) + '%';
+  } else {
+    endPct = Math.max(pct, startPct + 0.03);
+    handleEnd.style.top = (endPct * 100) + '%';
+  }
+  render();
+}
+
+function hexToRgb(hex) {
+  return { r: parseInt(hex.slice(1,3),16), g: parseInt(hex.slice(3,5),16), b: parseInt(hex.slice(5,7),16) };
+}
+
+function applyFade(ctx, w, h) {
+  const rgb = hexToRgb(color);
+  const maxAlpha = parseInt(document.getElementById('opacitySlider').value) / 100;
+  const y0 = startPct * h;
+  const y1 = endPct * h;
+  const grad = ctx.createLinearGradient(0, y0, 0, y1);
+  for (let i = 0; i <= 30; i++) {
+    const t = i / 30;
+    const alpha = t * t * (3 - 2 * t) * maxAlpha;
+    grad.addColorStop(t, `rgba(${rgb.r},${rgb.g},${rgb.b},${alpha.toFixed(4)})`);
+  }
+  ctx.fillStyle = grad;
+  ctx.fillRect(0, y0, w, h - y0);
+}
+
+function render() {
+  if (!img) return;
+  const canvas = document.getElementById('canvas');
+  canvas.width  = img.naturalWidth;
+  canvas.height = img.naturalHeight;
+  const ctx = canvas.getContext('2d');
+  ctx.drawImage(img, 0, 0);
+  applyFade(ctx, canvas.width, canvas.height);
+}
+
+function download() {
+  if (!img) return;
+  const off = document.createElement('canvas');
+  off.width  = img.naturalWidth;
+  off.height = img.naturalHeight;
+  const ctx = off.getContext('2d');
+  ctx.drawImage(img, 0, 0);
+  applyFade(ctx, off.width, off.height);
+  off.toBlob(blob => {
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = 'jgm_fade.png'; a.click();
+    URL.revokeObjectURL(url);
+    const t = document.getElementById('toast');
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 2000);
+  }, 'image/png');
+}
+</script>
+</body>
+</html>
