@@ -206,36 +206,16 @@ function applyFade(ctx,w,h){
   var op=parseInt(document.getElementById('opSlider').value)/100;
   var y0=sP*h, y1=eP*h;
 
-  // Fade the player's alpha in the gradient zone
-  var ag=ctx.createLinearGradient(0,y0,0,y1);
+  // Simple gradient overlay from start to bottom
+  var g=ctx.createLinearGradient(0,y0,0,y1);
   for(var i=0;i<=30;i++){
     var t=i/30;
-    var fa=t*t*(3-2*t); // smooth step 0→1
-    var keep=1-fa*op;   // 1 at top of fade, (1-op) at bottom
-    ag.addColorStop(t,'rgba(0,0,0,'+Math.max(0,Math.min(1,keep)).toFixed(4)+')');
+    var a=t*t*(3-2*t)*op;
+    g.addColorStop(t,'rgba('+rgb.r+','+rgb.g+','+rgb.b+','+a.toFixed(4)+')');
   }
-  ctx.globalCompositeOperation='destination-in';
-  ctx.fillStyle='rgba(0,0,0,1)';
-  ctx.fillRect(0,0,w,y0); // above fade: keep fully
-  ctx.fillStyle=ag;
-  ctx.fillRect(0,y0,w,h-y0); // fade zone: reduce alpha
   ctx.globalCompositeOperation='source-over';
-
-  // Paint fade color behind player
-  var bg=document.createElement('canvas');
-  bg.width=w; bg.height=h;
-  var bc=bg.getContext('2d');
-  var cg=bc.createLinearGradient(0,y0,0,y1);
-  for(var j=0;j<=30;j++){
-    var t2=j/30;
-    var a=t2*t2*(3-2*t2)*op;
-    cg.addColorStop(t2,'rgba('+rgb.r+','+rgb.g+','+rgb.b+','+a.toFixed(4)+')');
-  }
-  bc.fillStyle=cg;
-  bc.fillRect(0,y0,w,h-y0);
-  ctx.globalCompositeOperation='destination-over';
-  ctx.drawImage(bg,0,0);
-  ctx.globalCompositeOperation='source-over';
+  ctx.fillStyle=g;
+  ctx.fillRect(0,y0,w,h-y0);
 }
 
 function render(){
