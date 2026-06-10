@@ -1,1 +1,1 @@
-,{"color":"toat","type1":"rating","type2":"club","attribute1":"0","attribute2":"112658","amount":1,"isMet":false}
+,{"name":"","descriptionText":"","ids":["10921"],"color":"","position":"","minRating":0,"maxRating":0,"leagueId":0,"clubId":0,"nationId":0,"packableOnly":false,"newProbability":0,"price":0,"startTime":0,"expireTime":-1,"numAvailable":0,"orderPriority":0,"isTradable2":true,"cover":"","id":"j"}
