@@ -1,1 +1,1 @@
-,{"type":"ψe-☂●η","amount":2,"id":"₩●>9"}
+,{"type":"coins","amount":2,"id":"coins"}
