@@ -1,0 +1,55 @@
+<style>
+textarea { width: 100%; font-family: var(--font-mono); font-size: 12px; resize: vertical; }
+button { cursor: pointer; }
+#output { white-space: pre-wrap; word-break: break-all; font-family: var(--font-mono); font-size: 12px; background: var(--color-background-secondary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-md); padding: 12px; min-height: 80px; max-height: 400px; overflow-y: auto; }
+</style>
+
+<h2 class="sr-only">Herramienta para formatear JSON de objectives — añade saltos de línea después de cada objective</h2>
+
+<div style="padding: 1rem 0;">
+  <p style="font-size: 13px; color: var(--color-text-secondary); margin: 0 0 8px;">Pega tu JSON aquí:</p>
+  <textarea id="input" rows="8" placeholder='[{"id":974,...},{"id":981,...}]'></textarea>
+
+  <div style="display: flex; gap: 8px; margin: 12px 0;">
+    <button onclick="formatJson()" style="flex:1;">Formatear</button>
+    <button onclick="copyOutput()" style="flex:1;">Copiar resultado</button>
+    <button onclick="clearAll()" style="flex:1;">Limpiar</button>
+  </div>
+
+  <p style="font-size: 13px; color: var(--color-text-secondary); margin: 0 0 8px;">Resultado:</p>
+  <div id="output">El resultado aparecerá aquí...</div>
+  <p id="status" style="font-size: 12px; color: var(--color-text-secondary); margin: 8px 0 0;"></p>
+</div>
+
+<script>
+function formatJson() {
+  const input = document.getElementById('input').value.trim();
+  if (!input) {
+    document.getElementById('status').textContent = 'Pega el JSON primero.';
+    return;
+  }
+  const result = input.replace(/\}\]\},?\{/g, (match) => {
+    if (match.endsWith(',{')) {
+      return '}]}\n\n\n,{';
+    }
+    return match;
+  });
+  const count = (result.match(/\n\n\n/g) || []).length;
+  document.getElementById('output').textContent = result;
+  document.getElementById('status').textContent = count + ' separador(es) añadido(s).';
+}
+
+function copyOutput() {
+  const text = document.getElementById('output').textContent;
+  if (text === 'El resultado aparecerá aquí...') return;
+  navigator.clipboard.writeText(text).then(() => {
+    document.getElementById('status').textContent = 'Copiado al portapapeles.';
+  });
+}
+
+function clearAll() {
+  document.getElementById('input').value = '';
+  document.getElementById('output').textContent = 'El resultado aparecerá aquí...';
+  document.getElementById('status').textContent = '';
+}
+</script>
