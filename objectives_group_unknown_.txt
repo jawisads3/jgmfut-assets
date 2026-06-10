@@ -1,1 +1,0 @@
-,{"color":"toat","type1":"rating","type2":"club","attribute1":"0","attribute2":"112658","amount":1,"isMet":false}
