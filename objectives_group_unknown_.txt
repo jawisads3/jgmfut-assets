@@ -1,1 +1,1 @@
-,{"type":"coins","amount":2,"id":"coins"}
+,{"type":"","minmax":"","attribute":"","value":0,"isMet":false}
