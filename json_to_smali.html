@@ -1,0 +1,304 @@
+<div style="background: #0a0a0f; padding: 20px 16px 32px; border-radius: 16px; font-family: 'Syne', sans-serif; color: #e2e8f0;">
+<h2 class="sr-only">Conversor de JSON de jugador a bloque smali, con tema JGM</h2>
+
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;700;800&display=swap');
+.jgm-input {
+  width: 100%;
+  background: #1a1a26;
+  border: 1px solid #2a2a40;
+  border-radius: 10px;
+  padding: 14px 16px;
+  color: #e2e8f0;
+  font-family: 'Space Mono', monospace;
+  font-size: 13px;
+  outline: none;
+  transition: border-color 0.2s;
+  resize: vertical;
+  display: block;
+}
+.jgm-input:focus { border-color: #7b5cf0; }
+.jgm-card {
+  background: #12121a;
+  border: 1px solid #2a2a40;
+  border-radius: 16px;
+  padding: 20px;
+  margin-bottom: 16px;
+}
+.jgm-label {
+  font-size: 12px;
+  font-weight: 700;
+  color: #a78bfa;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  margin-bottom: 12px;
+  display: block;
+  font-family: 'Syne', sans-serif;
+}
+.jgm-gen-btn {
+  width: 100%;
+  background: #7b5cf0;
+  color: white;
+  border: none;
+  border-radius: 12px;
+  padding: 16px;
+  font-family: 'Syne', sans-serif;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  letter-spacing: 0.5px;
+  transition: opacity 0.15s, transform 0.1s;
+  display: block;
+}
+.jgm-gen-btn:active { opacity: 0.85; transform: scale(0.98); }
+.jgm-copy-btn {
+  width: 100%;
+  background: #1a1a26;
+  border: 1px solid #2a2a40;
+  border-radius: 10px;
+  padding: 12px;
+  color: #a78bfa;
+  font-family: 'Syne', sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  margin-top: 10px;
+  cursor: pointer;
+  transition: border-color 0.2s;
+  display: block;
+}
+.jgm-copy-btn:hover { border-color: #7b5cf0; }
+.jgm-result-box {
+  background: #1a1a26;
+  border: 1px solid #2a2a40;
+  border-radius: 10px;
+  padding: 16px;
+  font-family: 'Space Mono', monospace;
+  font-size: 12px;
+  color: #4ade80;
+  word-break: break-all;
+  line-height: 1.6;
+  min-height: 80px;
+  margin-top: 8px;
+  white-space: pre-wrap;
+  overflow-x: auto;
+}
+.jgm-error-box {
+  background: rgba(228, 90, 90, 0.12);
+  border: 1px solid rgba(228, 90, 90, 0.3);
+  border-radius: 10px;
+  padding: 12px 16px;
+  font-family: 'Space Mono', monospace;
+  font-size: 12px;
+  color: #f87171;
+  margin-bottom: 16px;
+}
+.jgm-tag {
+  display: inline-block;
+  background: rgba(123, 92, 240, 0.15);
+  color: #a78bfa;
+  border: 1px solid rgba(123, 92, 240, 0.3);
+  border-radius: 6px;
+  padding: 3px 10px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  margin-bottom: 12px;
+  font-family: 'Space Mono', monospace;
+}
+.jgm-toast {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%) translateY(80px);
+  background: #4ade80;
+  color: #0a0a0f;
+  padding: 12px 24px;
+  border-radius: 100px;
+  font-weight: 700;
+  font-size: 14px;
+  font-family: 'Syne', sans-serif;
+  transition: transform 0.3s ease;
+  z-index: 999;
+  white-space: nowrap;
+  pointer-events: none;
+}
+.jgm-toast.show { transform: translateX(-50%) translateY(0); }
+</style>
+
+<header style="text-align: center; margin-bottom: 28px; padding-top: 8px;">
+  <h1 style="font-size: 26px; font-weight: 800; background: linear-gradient(135deg, #a78bfa, #c4b5fd); -webkit-background-clip: text; -webkit-text-fill-color: transparent; letter-spacing: -0.5px;">JGM JSON to Smali</h1>
+  <p style="font-size: 13px; color: #64748b; margin-top: 4px; font-family: 'Space Mono', monospace;">conversor de jugador custom</p>
+</header>
+
+<div class="jgm-card">
+  <span class="jgm-label">JSON del jugador</span>
+  <textarea id="jsonInput" rows="6" class="jgm-input" placeholder='{"PHY":100,"PAS":100,"DEF":100,"color":"toty","rating":100,"nationId":38,"clubId":112658,"control":100,"baseId":6044,"url":"http","itemId":0,"packable":1,"PAC":100,"defense":100,"leagueId":2118,"attack":100,"totwNumber":-1,"name":"MBAPPE","DRI":100,"SHO":100,"position":"ST","id":"idGreat20"}'></textarea>
+  <button id="convertBtn" class="jgm-gen-btn" style="margin-top: 16px;">Convertir a smali</button>
+</div>
+
+<div id="errorBox" class="jgm-error-box" style="display:none;"></div>
+
+<div class="jgm-card" id="resultBox" style="display:none;">
+  <div class="jgm-tag">resultado</div>
+  <span class="jgm-label">Bloque smali generado</span>
+  <div id="smaliOutput" class="jgm-result-box"></div>
+  <button id="copyBtn" class="jgm-copy-btn">Copiar texto</button>
+</div>
+
+<div class="jgm-toast" id="toast">Copiado!</div>
+</div>
+
+<script>
+function repairJson(raw) {
+  let s = raw.trim();
+  s = s.replace(/\\"/g, '"');
+  s = s.replace(/^\[|\]$/g, '');
+  s = s.replace(/,\s*$/, '');
+  const firstBrace = s.indexOf('{');
+  const lastBrace = s.lastIndexOf('}');
+  if (firstBrace !== -1 && lastBrace !== -1) {
+    s = s.substring(firstBrace, lastBrace + 1);
+  }
+  return s;
+}
+
+function toHex(num) {
+  num = Math.trunc(Number(num) || 0);
+  if (num < 0) {
+    return '-0x' + Math.abs(num).toString(16);
+  }
+  return '0x' + num.toString(16);
+}
+
+function escapeSmaliString(s) {
+  return String(s == null ? '' : s).replace(/\\/g, '\\\\').replace(/"/g, '\\"');
+}
+
+function buildSmaliBlock(p) {
+  const lines = [];
+  lines.push('new-instance v1, Lnb/a;');
+  lines.push('');
+  lines.push('const-string v2, "' + escapeSmaliString(p.name) + '"');
+  lines.push('');
+  lines.push('const-string v3, "' + escapeSmaliString(p.id) + '"');
+  lines.push('');
+  lines.push('const v4, ' + toHex(p.baseId));
+  lines.push('');
+  lines.push('const/16 v5, ' + toHex(p.rating));
+  lines.push('');
+  lines.push('const-string v6, "' + escapeSmaliString(p.position) + '"');
+  lines.push('');
+  lines.push('const-string v7, "' + escapeSmaliString(p.position) + '"');
+  lines.push('');
+  lines.push('const-string v8, "' + escapeSmaliString(p.color) + '"');
+  lines.push('');
+  lines.push('const/16 v9, ' + toHex(p.clubId));
+  lines.push('');
+  lines.push('const/16 v10, ' + toHex(p.leagueId));
+  lines.push('');
+  lines.push('const/16 v11, ' + toHex(p.nationId));
+  lines.push('');
+  lines.push('const-string v12, "' + escapeSmaliString(p.url) + '"');
+  lines.push('');
+  lines.push('const/4 v13, -0x1');
+  lines.push('');
+  lines.push('const/4 v14, 0x1');
+  lines.push('');
+  lines.push('const/4 v15, 0x0');
+  lines.push('');
+  const stats = [p.PAC, p.SHO, p.PAS, p.DRI, p.DEF, p.PHY, p.attack, p.control, p.defense];
+  const regNames = ['v16','v17','v18','v19','v20','v21','v22','v23','v24'];
+  for (let i = 0; i < stats.length; i++) {
+    lines.push('const/16 ' + regNames[i] + ', ' + toHex(stats[i]));
+    lines.push('');
+  }
+  lines.push('const/16 v25, 0x0');
+  lines.push('');
+  lines.push('const/16 v26, 0x0');
+  lines.push('');
+  lines.push('invoke-direct/range {v1 .. v26}, Lnb/a;-><init>(Ljava/lang/String;Ljava/lang/String;IILjava/lang/String;Ljava/lang/String;Ljava/lang/String;IIILjava/lang/String;IIIIIIIIIIIIII)V');
+  lines.push('');
+  lines.push('invoke-virtual {v0, v1}, Ljava/util/ArrayList;->add(Ljava/lang/Object;)Z');
+  return lines.join('\n');
+}
+
+document.getElementById('convertBtn').addEventListener('click', () => {
+  const errorBox = document.getElementById('errorBox');
+  const resultBox = document.getElementById('resultBox');
+  errorBox.style.display = 'none';
+  resultBox.style.display = 'none';
+
+  const raw = document.getElementById('jsonInput').value;
+  if (!raw.trim()) {
+    errorBox.textContent = 'Pega un JSON primero.';
+    errorBox.style.display = 'block';
+    return;
+  }
+
+  let parsed;
+  try {
+    const repaired = repairJson(raw);
+    parsed = JSON.parse(repaired);
+  } catch (e) {
+    errorBox.textContent = 'No se pudo parsear el JSON: ' + e.message;
+    errorBox.style.display = 'block';
+    return;
+  }
+
+  const player = {
+    name: parsed.name || 'CUSTOM',
+    id: parsed.id || ('id' + Math.floor(Math.random()*900000000+100000000)),
+    baseId: parsed.baseId || 0,
+    rating: parsed.rating || 0,
+    position: parsed.position || 'CAM',
+    color: parsed.color || 'toty',
+    clubId: parsed.clubId || 0,
+    leagueId: parsed.leagueId || 0,
+    nationId: parsed.nationId || 0,
+    url: parsed.url || 'http',
+    PAC: parsed.PAC || 0,
+    SHO: parsed.SHO || 0,
+    PAS: parsed.PAS || 0,
+    DRI: parsed.DRI || 0,
+    DEF: parsed.DEF || 0,
+    PHY: parsed.PHY || 0,
+    attack: parsed.attack || 0,
+    control: parsed.control || 0,
+    defense: parsed.defense || 0
+  };
+
+  const smali = buildSmaliBlock(player);
+  document.getElementById('smaliOutput').textContent = smali;
+  resultBox.style.display = 'block';
+});
+
+document.getElementById('copyBtn').addEventListener('click', () => {
+  const text = document.getElementById('smaliOutput').textContent;
+  if (!text) return;
+  if (navigator.clipboard) {
+    navigator.clipboard.writeText(text).then(showJgmToast).catch(() => fallbackCopy(text));
+  } else {
+    fallbackCopy(text);
+  }
+});
+
+function fallbackCopy(text) {
+  const ta = document.createElement('textarea');
+  ta.value = text;
+  ta.style.position = 'fixed';
+  ta.style.opacity = '0';
+  document.body.appendChild(ta);
+  ta.focus();
+  ta.select();
+  document.execCommand('copy');
+  document.body.removeChild(ta);
+  showJgmToast();
+}
+
+function showJgmToast() {
+  const t = document.getElementById('toast');
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2000);
+}
+</script>
