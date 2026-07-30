@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Descifrador / Cifrador (HEX + XOR)</title>
+<style>
+  * { box-sizing: border-box; }
+  body { font-family: system-ui, sans-serif; max-width: 720px; margin: 40px auto; padding: 0 16px; background:#0f172a; color:#e2e8f0; }
+  h1 { font-size: 1.4rem; }
+  .tabs { display:flex; gap:8px; margin-bottom:18px; }
+  .tab { flex:1; padding:10px; text-align:center; border-radius:8px; background:#1e293b; border:1px solid #334155; cursor:pointer; font-weight:600; }
+  .tab.active { background:#3b82f6; border-color:#3b82f6; color:#fff; }
+  label { display:block; margin: 14px 0 6px; font-weight:600; }
+  textarea, input { width:100%; padding:10px; border-radius:8px; border:1px solid #334155; background:#1e293b; color:#e2e8f0; font-family:monospace; }
+  textarea { min-height:90px; resize:vertical; }
+  button { margin-top:14px; padding:10px 20px; border:none; border-radius:8px; background:#3b82f6; color:#fff; font-weight:600; cursor:pointer; }
+  button:hover { background:#2563eb; }
+  .result { margin-top:20px; padding:14px; background:#1e293b; border-radius:8px; border:1px solid #334155; white-space:pre-wrap; word-break:break-word; min-height:24px; font-family:monospace; }
+  .hint { font-size:.8rem; color:#94a3b8; margin-top:6px; }
+</style>
+</head>
+<body>
+  <h1>🔐 HEX + XOR — Descifrar / Cifrar</h1>
+
+  <div class="tabs">
+    <div class="tab active" id="tabDec" onclick="setMode('dec')">🔓 Descifrar (HEX → texto)</div>
+    <div class="tab" id="tabEnc" onclick="setMode('enc')">🔒 Cifrar (texto → HEX)</div>
+  </div>
+
+  <label id="inLabel" for="input">String cifrado (hexadecimal)</label>
+  <textarea id="input" placeholder="Ej: 1A2B3C..."></textarea>
+
+  <label for="key">Clave XOR</label>
+  <input id="key" value="draft">
+  <div class="hint">Por defecto "draft". Cámbiala si esa sección del juego usa otra clave.</div>
+
+  <button onclick="run()">Ejecutar</button>
+
+  <label>Resultado:</label>
+  <div class="result" id="result"></div>
+
+<script>
+const HEX = "0123456789ABCDEF";
+let mode = 'dec';
+
+function setMode(m) {
+  mode = m;
+  document.getElementById('tabDec').classList.toggle('active', m === 'dec');
+  document.getElementById('tabEnc').classList.toggle('active', m === 'enc');
+  document.getElementById('inLabel').textContent = (m === 'dec')
+    ? 'String cifrado (hexadecimal)'
+    : 'Texto plano a cifrar';
+  document.getElementById('input').placeholder = (m === 'dec') ? 'Ej: 1A2B3C...' : 'Ej: hola mundo';
+  document.getElementById('result').textContent = '';
+}
+
+function run() {
+  const key = document.getElementById('key').value;
+  const out = document.getElementById('result');
+  if (!key.length) { out.textContent = "⚠️ Falta la clave."; return; }
+  (mode === 'dec') ? descifrar(key, out) : cifrar(key, out);
+}
+
+function descifrar(key, out) {
+  let str = document.getElementById('input').value.trim().toUpperCase().replace(/\s+/g, '');
+  if (str.length % 2 !== 0) { out.textContent = "⚠️ La cadena hex debe tener un número par de caracteres."; return; }
+
+  const bytes = [];
+  for (let i = 0; i < str.length; i += 2) {
+    const hi = HEX.indexOf(str[i]);
+    const lo = HEX.indexOf(str[i+1]);
+    if (hi < 0 || lo < 0) { out.textContent = "⚠️ Carácter no hexadecimal detectado."; return; }
+    bytes.push((hi << 4) | lo);
+  }
+  for (let i = 0; i < bytes.length; i++) {
+    bytes[i] ^= key.charCodeAt(i % key.length);
+  }
+  try {
+    out.textContent = new TextDecoder('utf-8').decode(new Uint8Array(bytes));
+  } catch(e) {
+    out.textContent = bytes.map(b => String.fromCharCode(b)).join('');
+  }
+}
+
+function cifrar(key, out) {
+  const text = document.getElementById('input').value;
+  const bytes = Array.from(new TextEncoder().encode(text));
+  for (let i = 0; i < bytes.length; i++) {
+    bytes[i] ^= key.charCodeAt(i % key.length);
+  }
+  out.textContent = bytes.map(b => HEX[(b >> 4) & 0xF] + HEX[b & 0xF]).join('');
+}
+</script>
+</body>
+</html>
