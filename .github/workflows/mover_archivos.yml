@@ -1,27 +1,31 @@
 name: Mover Renders Automaticamente
 
 on:
-  workflow_dispatch: # Esto permite que lo ejecutes manualmente con un botón
+  workflow_dispatch:
 
 jobs:
   move-files:
     runs-on: ubuntu-latest
     steps:
-      - name: Clonar repositorio
+      - name: Clonar repositorio con historial completo
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # Asegura traer absolutamente todos los archivos y ramas
 
       - name: Crear carpeta de destino si no existe
         run: mkdir -p jgmfut-assets/faces
 
-      - name: Mover archivos render_id
+      - name: Forzar movimiento de archivos render_id
         run: |
-          # Mueve todas las imágenes que empiecen con render_id a la carpeta destino
-          mv render_id* jgmfut-assets/faces/ || echo "No se encontraron más archivos"
+          # Forzamos (-f) el movimiento de cualquier coincidencia en la raíz
+          mv -f render_id*.png jgmfut-assets/faces/ || echo "No se encontraron más imágenes .png en la raíz"
 
       - name: Confirmar y guardar cambios en GitHub
         run: |
           git config --global user.name "GitHub Action"
           git config --global user.email "action@github.com"
           git add jgmfut-assets/faces/
-          git commit -m "Mover automaticamente archivos render_id a jgmfut-assets/faces" || echo "Sin cambios"
+          # Registra también las eliminaciones de la raíz
+          git add -A 
+          git commit -m "Forzar traslado masivo de renders" || echo "Sin cambios pendientes"
           git push
