@@ -7,25 +7,40 @@ jobs:
   move-files:
     runs-on: ubuntu-latest
     steps:
-      - name: Clonar repositorio con historial completo
+      - name: Clonar repositorio
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0 # Asegura traer absolutamente todos los archivos y ramas
+          fetch-depth: 0
 
-      - name: Crear carpeta de destino si no existe
-        run: mkdir -p jgmfut-assets/faces
+      - name: Crear carpeta faces si no existe
+        run: mkdir -p faces
 
-      - name: Forzar movimiento de archivos render_id
+      - name: Arreglar archivo con nombre roto
         run: |
-          # Forzamos (-f) el movimiento de cualquier coincidencia en la raíz
-          mv -f render_id*.png jgmfut-assets/faces/ || echo "No se encontraron más imágenes .png en la raíz"
+          if [ -f facesrender_99021.png ]; then
+            mv facesrender_99021.png faces/render_99021.png
+          fi
 
-      - name: Confirmar y guardar cambios en GitHub
+      - name: Vaciar la carpeta con nombre incorrecto
+        run: |
+          # Si existe la carpeta incorrecta, pasa todo su contenido a "faces" y luego la borra
+          if [ -d "jgmfut-assets/faces" ]; then
+            mv -f jgmfut-assets/faces/* faces/ || echo "Carpeta vieja vacía"
+            rm -rf jgmfut-assets/faces
+            
+            # Si la carpeta contenedora "jgmfut-assets" queda vacía, también la borra
+            rmdir jgmfut-assets || echo "jgmfut-assets contiene otros archivos, se mantiene"
+          fi
+
+      - name: Mover cualquier render restante de la raiz
+        run: |
+          mv -f render_* faces/ || echo "No hay más imágenes en la raíz"
+
+      - name: Confirmar y guardar todos los cambios
         run: |
           git config --global user.name "GitHub Action"
           git config --global user.email "action@github.com"
-          git add jgmfut-assets/faces/
-          # Registra también las eliminaciones de la raíz
-          git add -A 
-          git commit -m "Forzar traslado masivo de renders" || echo "Sin cambios pendientes"
+          git add faces/
+          git add -A
+          git commit -m "Corregir estructura: eliminar jgmfut-assets/faces y dejar solo faces" || echo "Sin cambios"
           git push
