@@ -1,10 +1,10 @@
-name: Mover Renders Automaticamente
+name: Mover y Renombrar Renders Avanzado
 
 on:
   workflow_dispatch:
 
 jobs:
-  move-files:
+  move-and-rename:
     runs-on: ubuntu-latest
     steps:
       - name: Clonar repositorio
@@ -15,26 +15,35 @@ jobs:
       - name: Crear carpeta faces si no existe
         run: mkdir -p faces
 
-      - name: Arreglar archivo con nombre roto
+      - name: Mover archivos desde subcarpetas a faces
         run: |
-          if [ -f facesrender_99021.png ]; then
-            mv facesrender_99021.png faces/render_99021.png
+          # Mueve contenido de normalFaces23 si la carpeta existe
+          if [ -d "normalFaces23" ]; then
+            mv -f normalFaces23/*.png faces/ || echo "No hay pngs en normalFaces23"
+            rmdir normalFaces23 || echo "normalFaces23 no está vacía"
+          fi
+          
+          # Mueve contenido de specialFaces o specialFaces23 si existen
+          if [ -d "specialFaces" ]; then
+            mv -f specialFaces/*.png faces/ || echo "No hay pngs en specialFaces"
+            rmdir specialFaces || echo "specialFaces no está vacía"
+          fi
+          if [ -d "specialFaces23" ]; then
+            mv -f specialFaces23/*.png faces/ || echo "No hay pngs en specialFaces23"
+            rmdir specialFaces23 || echo "specialFaces23 no está vacía"
           fi
 
-      - name: Vaciar la carpeta con nombre incorrecto
+      - name: Renombrar archivos numericos en faces
         run: |
-          # Si existe la carpeta incorrecta, pasa todo su contenido a "faces" y luego la borra
-          if [ -d "jgmfut-assets/faces" ]; then
-            mv -f jgmfut-assets/faces/* faces/ || echo "Carpeta vieja vacía"
-            rm -rf jgmfut-assets/faces
-            
-            # Si la carpeta contenedora "jgmfut-assets" queda vacía, también la borra
-            rmdir jgmfut-assets || echo "jgmfut-assets contiene otros archivos, se mantiene"
-          fi
-
-      - name: Mover cualquier render restante de la raiz
-        run: |
-          mv -f render_* faces/ || echo "No hay más imágenes en la raíz"
+          cd faces
+          # Buscamos todos los archivos .png dentro de la carpeta faces
+          for file in *.png; do
+            # Si el archivo existe y NO empieza con "render_"
+            if [ -f "$file" ] && [[ ! "$file" =~ ^render_ ]]; then
+              echo "Procesando archivo sin prefijo: $file"
+              mv "$file" "render_id$file"
+            fi
+          done
 
       - name: Confirmar y guardar todos los cambios
         run: |
@@ -42,5 +51,5 @@ jobs:
           git config --global user.email "action@github.com"
           git add faces/
           git add -A
-          git commit -m "Corregir estructura: eliminar jgmfut-assets/faces y dejar solo faces" || echo "Sin cambios"
+          git commit -m "Automatizacion completa: unificar carpetas y renombrar a render_id" || echo "Sin cambios"
           git push
